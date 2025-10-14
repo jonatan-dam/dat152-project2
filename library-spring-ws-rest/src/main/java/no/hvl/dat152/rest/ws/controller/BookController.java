@@ -71,7 +71,32 @@ public class BookController {
 	// TODO - getAuthorsOfBookByISBN (@Mappings, URI, and method)
 	
 	// TODO - updateBookByISBN (@Mappings, URI, and method)
+	@PutMapping("/books/{isbn}")
+	public ResponseEntity<Book> updateBook(@RequestBody Book book) throws BookNotFoundException {
+		Book ubook = bookService.updateBook(book);
+		
+		if(book == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			return new ResponseEntity<>(ubook, HttpStatus.OK);
+		}
+		
+	}
 	
 	// TODO - deleteBookByISBN (@Mappings, URI, and method)
+	@DeleteMapping("/books/{isbn}")
+	public ResponseEntity<String> deleteByISBN(@PathVariable String isbn) throws BookNotFoundException {
+		
+		Book book = bookService.findByISBN(isbn);
+		
+		if(book == null){
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			bookService.deleteByISBN(isbn);
+			String response = "Book deleted.";
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+		
+	}
 
 }

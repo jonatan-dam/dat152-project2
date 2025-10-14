@@ -24,6 +24,8 @@ public interface BookRepository extends CrudRepository<Book, Long>, PagingAndSor
 	
 	Optional<Book> findByIsbn(String isbn);
 	
+	Optional<Book> findById(long id);
+	
 	Page<Book> findAll(Pageable pageable);
 	
 	Iterable<Book> findAll(Sort sort);
@@ -38,4 +40,6 @@ public interface BookRepository extends CrudRepository<Book, Long>, PagingAndSor
 	List<Book> findAllPaginate(@Param("limit") int limit, @Param("offset") int offset);
 	
 	List<Book> findByTitleContaining(String term);
+	
+	
 }

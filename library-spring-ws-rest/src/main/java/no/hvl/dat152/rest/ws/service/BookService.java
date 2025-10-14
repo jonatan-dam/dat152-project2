@@ -3,6 +3,7 @@
  */
 package no.hvl.dat152.rest.ws.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,13 +50,52 @@ public class BookService {
 	}
 	
 	// TODO public Book updateBook(Book book, String isbn)
+	public Book updateBook(Book book) throws BookNotFoundException {
+		Book existingBook = bookRepository.findByIsbn(book.getIsbn())
+				.orElseThrow(() -> new BookNotFoundException("Book with isbn ="+book.getIsbn()+" not found!"));
+		
+		existingBook.setTitle(book.getTitle());
+		existingBook.setAuthors(book.getAuthors());
+		return existingBook;
+		
+	}
 	
 	// TODO public List<Book> findAllPaginate(Pageable page)
+	//public List<Book> findAllPaginate(Pageable page){
+		
+	//}
 	
 	// TODO public Set<Author> findAuthorsOfBookByISBN(String isbn)
+	public Set<Author> findAuthorsOfBookByISBN(String isbn){
+		Set<Author> authors = new HashSet<>();
+		Book book = null;
+		try {
+			book = findByISBN(isbn);
+		} catch (BookNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		authors = book.getAuthors();
+		
+		return authors;
+	}
 	
 	// TODO public void deleteById(long id)
+	public void deleteById(long id) throws BookNotFoundException {
+		Book book = bookRepository.findById(id)
+				.orElseThrow(() -> new BookNotFoundException("Book with id = "+id+" not found!"));
+		
+		bookRepository.delete(book);
+	}
 	
 	// TODO public void deleteByISBN(String isbn) 
+	public void deleteByISBN(String isbn) throws BookNotFoundException {
+		Book book = bookRepository.findByIsbn(isbn)
+				.orElseThrow(() -> new BookNotFoundException("Book wtih isbn = "+isbn+" not found!"));
+		
+		bookRepository.delete(book);
+		
+	}
 	
 }
