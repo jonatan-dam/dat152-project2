@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import no.hvl.dat152.rest.ws.exceptions.AuthorNotFoundException;
+import no.hvl.dat152.rest.ws.exceptions.BookNotFoundException;
 import no.hvl.dat152.rest.ws.model.Author;
 import no.hvl.dat152.rest.ws.model.Book;
 import no.hvl.dat152.rest.ws.repository.AuthorRepository;
@@ -65,11 +66,15 @@ public class AuthorService {
 	}
 	
 	// TODO public Set<Book> findBooksByAuthorId(int id)
-	public Set<Book> findBooksByAuthorId(int id) throws AuthorNotFoundException {
+	public Set<Book> findBooksByAuthorId(int id) throws AuthorNotFoundException, BookNotFoundException {
 		Author author = authorRepository.findById(id)
 				.orElseThrow(() -> new AuthorNotFoundException("Author with id = "+id+" not found!"));
 		
 		Set<Book> books = author.getBooks();
-		return books;
+		if(books == null || books.isEmpty()) {
+			throw new BookNotFoundException("Books for author = " +id+" not found!");
+		} else {
+			return books;
+		}
 	}
 }

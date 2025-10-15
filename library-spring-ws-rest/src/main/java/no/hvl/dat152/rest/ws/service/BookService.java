@@ -61,9 +61,12 @@ public class BookService {
 	}
 	
 	// TODO public List<Book> findAllPaginate(Pageable page)
-	//public List<Book> findAllPaginate(Pageable page){
-		
-	//}
+	public List<Book> findAllPaginate(Pageable page){
+		int limit = page.getPageSize();
+		int offset = page.getPageNumber() * page.getPageSize();
+		return bookRepository.findAllPaginate(limit, offset);
+	}
+	
 	
 	// TODO public Set<Author> findAuthorsOfBookByISBN(String isbn)
 	public Set<Author> findAuthorsOfBookByISBN(String isbn){

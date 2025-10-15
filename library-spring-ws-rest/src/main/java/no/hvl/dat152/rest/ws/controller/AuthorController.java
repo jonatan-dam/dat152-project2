@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.hvl.dat152.rest.ws.exceptions.AuthorNotFoundException;
+import no.hvl.dat152.rest.ws.exceptions.BookNotFoundException;
 import no.hvl.dat152.rest.ws.model.Author;
 import no.hvl.dat152.rest.ws.model.Book;
 import no.hvl.dat152.rest.ws.service.AuthorService;
@@ -48,7 +49,7 @@ public class AuthorController {
 		}
 		
 		@GetMapping("/authors/{id}")
-		public ResponseEntity<Author> getAuthors(@PathVariable int id) throws AuthorNotFoundException {
+		public ResponseEntity<Author> getAuthorById(@PathVariable int id) throws AuthorNotFoundException {
 			Author author = authorService.findById(id);
 			
 			if(author == null) {
@@ -59,8 +60,8 @@ public class AuthorController {
 		}
 		
 		@PostMapping("/authors")
-		public ResponseEntity<Author> createAuthor(@RequestBody Author author){
-			Author nAuthor = authorService.createAuthor(author);
+		public ResponseEntity<Author> saveAuthor(@RequestBody Author author){
+			Author nAuthor = authorService.saveAuthor(author);
 			
 			return new ResponseEntity<>(nAuthor, HttpStatus.CREATED);
 		}
@@ -90,6 +91,19 @@ public class AuthorController {
 		}
 	
 	// TODO - getBooksByAuthorId (@Mappings, URI, and method)
+		@GetMapping("/authors/{id}/books")
+		public ResponseEntity<Object> getBooksByAuthorId(@PathVariable int id) throws AuthorNotFoundException, BookNotFoundException {
+			Set<Book> books = authorService.findBooksByAuthorId(id);
+			
+			if(books == null) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			} else {
+				return new ResponseEntity<>(books, HttpStatus.OK);
+			}
+			
+			
+			
+		}
 	
 	
 
