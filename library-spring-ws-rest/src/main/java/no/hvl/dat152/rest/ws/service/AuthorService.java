@@ -39,14 +39,14 @@ public class AuthorService {
 	}	
 	
 	// TODO public Author updateAuthor(Author author, int id)
-	public Author updateAuthor(int authorId, Author author) {
-		return authorRepository.findById(authorId).map(existing -> {
-			existing.setFirstname(author.getFirstname());
-			existing.setLastname(author.getLastname());
-			return authorRepository.save(existing);
-		}).orElse(null);
+	public Author updateAuthor(int authorId, Author author) throws AuthorNotFoundException {
+		Author existing = authorRepository.findById(authorId)
+				.orElseThrow(() -> new AuthorNotFoundException("Author with id = "+authorId+" not found!"));
 		
-		
+		existing.setFirstname(author.getFirstname());
+		existing.setLastname(author.getLastname());
+		authorRepository.save(existing);
+		return existing;
 	}	
 	
 	// TODO public List<Author> findAll()

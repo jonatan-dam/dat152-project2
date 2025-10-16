@@ -6,9 +6,7 @@ package no.hvl.dat152.rest.ws.controller;
 import java.util.List;
 import java.util.Set;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,7 +39,7 @@ public class UserController {
 		
 		List<User> users = userService.findAllUsers();
 		
-		if(users.isEmpty())
+		if(users == null || users.isEmpty())
 			
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		else
@@ -58,17 +56,76 @@ public class UserController {
 	}
 	
 	// TODO - createUser (@Mappings, URI=/users, and method)
+	@PostMapping(value = "/users")
+	public ResponseEntity<User> createUser(@RequestBody User user){
+		User nUser = userService.saveUser(user);
+		
+		return new ResponseEntity<>(nUser, HttpStatus.CREATED);
+	}
 
 	// TODO - updateUser (@Mappings, URI, and method)
+	@PutMapping(value = "/users/{id}")
+	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id) throws UserNotFoundException {
+
+		if(user == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			User updatedUser = userService.updateUser(user, id);
+			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+		}
+	}
 	
 	// TODO - deleteUser (@Mappings, URI, and method)
+	@DeleteMapping(value = "/users/{id}")
+	public ResponseEntity<String> deleteUser(@PathVariable Long id) throws UserNotFoundException {
+		User user = userService.findUser(id);
+		
+		if(user == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			userService.deleteUser(id);
+			String response = "User with id = "+id+" has been deleted.";
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
 
 	// TODO - getUserOrders (@Mappings, URI=/users/{id}/orders, and method)
+	@GetMapping(value = "/users/{id}/orders")
+	public ResponseEntity<Object> getUserOrders(@PathVariable Long id) throws UserNotFoundException{
+		Set<Order> orders = userService.getUserOrders(id);
+		
+		if(orders == null || orders.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			return new ResponseEntity<>(orders, HttpStatus.OK);
+		}
+	}
 	
 	// TODO - getUserOrder (@Mappings, URI=/users/{uid}/orders/{oid}, and method)
-
-	// TODO - deleteUserOrder (@Mappings, URI, and method)
+	@GetMapping(value = "/users/{uid}/orders/{oid}")
+	public ResponseEntity<Order> getUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException {
+		Order order = userService.getUserOrder(uid, oid);
+		
+		if(order == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			return new ResponseEntity<>(order, HttpStatus.OK);
+		}
+	}
 	
+	// TODO - deleteUserOrder (@Mappings, URI, and method)
+	@DeleteMapping(value = "/users/{uid}/orders/{oid}")
+	public ResponseEntity<String> deleteUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException{
+		Order order = userService.getUserOrder(uid, oid);
+		
+		if(order == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			String response = "Order with id = "+oid+" belonging to user with id = "+uid+" has been deleted.";
+			userService.deleteOrderForUser(uid, oid);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
 	// TODO - createUserOrder (@Mappings, URI, and method) + HATEOAS links
 
 	

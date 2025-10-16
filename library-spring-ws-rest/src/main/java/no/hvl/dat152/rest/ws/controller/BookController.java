@@ -39,7 +39,7 @@ public class BookController {
 		
 		List<Book> books = bookService.findAll();
 		
-		if(books.isEmpty())
+		if(books == null || books.isEmpty())
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		
 		return new ResponseEntity<>(books, HttpStatus.OK);		
@@ -79,11 +79,11 @@ public class BookController {
 	// TODO - updateBookByISBN (@Mappings, URI, and method)
 	@PutMapping("/books/{isbn}")
 	public ResponseEntity<Book> updateBook(@RequestBody Book book) throws BookNotFoundException {
-		Book ubook = bookService.updateBook(book);
 		
 		if(book == null) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
+			Book ubook = bookService.updateBook(book);
 			return new ResponseEntity<>(ubook, HttpStatus.OK);
 		}
 		

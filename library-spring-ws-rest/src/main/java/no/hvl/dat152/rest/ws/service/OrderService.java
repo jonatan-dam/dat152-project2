@@ -40,11 +40,32 @@ public class OrderService {
 	}
 	
 	// TODO public void deleteOrder(Long id)
+	public void deleteOrder(Long id) throws OrderNotFoundException {
+		Order order = orderRepository.findById(id)
+				.orElseThrow(() -> new OrderNotFoundException("Order with id = "+id+" not found!"));
+		
+		orderRepository.delete(order);
+	}
 	
 	// TODO public List<Order> findAllOrders()
+	public List<Order> findAllOrders(){
+		return orderRepository.findAll();
+	}
+	
 	
 	// TODO public List<Order> findByExpiryDate(LocalDate expiry, Pageable page)
+	public List<Order> findByExpiryDate(LocalDate expiry, Pageable page) {
+		return orderRepository.findByExpiryBefore(expiry, page).getContent();
+	}
 	
 	// TODO public Order updateOrder(Order order, Long id)
+	public Order updateOrder(Order order, Long id) throws OrderNotFoundException {
+		Order existing = orderRepository.findById(id)
+				.orElseThrow(() -> new OrderNotFoundException("Order with id = "+id+" not found!"));
+		
+		existing.setExpiry(order.getExpiry());
+		orderRepository.save(existing);
+		return existing;
+	}
 
 }
