@@ -35,7 +35,7 @@ public class OrderController {
 	public ResponseEntity<Object> getAllBorrowOrders(){
 		List<Order> orders = orderService.findAllOrders();
 		
-		if(orders == null || orders.isEmpty()) {
+		if(orders.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
 			return new ResponseEntity<>(orders, HttpStatus.OK);
@@ -47,40 +47,27 @@ public class OrderController {
 	@GetMapping(value = "/orders/{id}")
 	public ResponseEntity<Order> getBorrowOrder(@PathVariable Long id) throws OrderNotFoundException {
 		Order order = orderService.findOrder(id);
+		return new ResponseEntity<>(order, HttpStatus.OK);
 		
-		if(order == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			return new ResponseEntity<>(order, HttpStatus.OK);
-		}
 	}
 	
 	
 	// TODO - updateOrder (@Mappings, URI=/orders/{id}, and method)
 	@PutMapping(value = "/orders/{id}")
 	public ResponseEntity<Order> updateOrder(@RequestBody Order order, @PathVariable Long id) throws OrderNotFoundException {
-
-		if(order == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			Order uOrder = orderService.updateOrder(order, id);
-			return new ResponseEntity<>(uOrder, HttpStatus.OK);
-		}
+		Order uOrder = orderService.updateOrder(order, id);
+		return new ResponseEntity<>(uOrder, HttpStatus.OK);
+		
 	}
 	
 	// TODO - deleteBookOrder (@Mappings, URI=/orders/{id}, and method)
 	@DeleteMapping(value = "/orders/{id}")
 	public ResponseEntity<String> deleteBookOrder(@PathVariable Long id) throws OrderNotFoundException {
-		Order order = orderService.findOrder(id);
-		
-		if(order == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			orderService.deleteOrder(id);
-			String response = "Order with id = "+id+" has been deleted.";
-			return new ResponseEntity<>(response, HttpStatus.OK);
+		orderService.deleteOrder(id);
+		String response = "Order with id = "+id+" has been deleted.";
+		return new ResponseEntity<>(response, HttpStatus.OK);
 			
-		}
+		
 		
 	}
 	

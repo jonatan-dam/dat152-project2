@@ -39,7 +39,7 @@ public class BookController {
 		
 		List<Book> books = bookService.findAll();
 		
-		if(books == null || books.isEmpty())
+		if(books.isEmpty())
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		
 		return new ResponseEntity<>(books, HttpStatus.OK);		
@@ -69,7 +69,7 @@ public class BookController {
 		Book book = bookService.findByISBN(isbn);
 		
 		Set<Author> authors = book.getAuthors();
-		if(authors == null || authors.isEmpty()) {
+		if(authors.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
 			return new ResponseEntity<>(authors, HttpStatus.OK);
@@ -79,13 +79,9 @@ public class BookController {
 	// TODO - updateBookByISBN (@Mappings, URI, and method)
 	@PutMapping("/books/{isbn}")
 	public ResponseEntity<Book> updateBook(@RequestBody Book book) throws BookNotFoundException {
+		Book ubook = bookService.updateBook(book);
+		return new ResponseEntity<>(ubook, HttpStatus.OK);
 		
-		if(book == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			Book ubook = bookService.updateBook(book);
-			return new ResponseEntity<>(ubook, HttpStatus.OK);
-		}
 		
 	}
 	
@@ -93,15 +89,10 @@ public class BookController {
 	@DeleteMapping("/books/{isbn}")
 	public ResponseEntity<String> deleteByISBN(@PathVariable String isbn) throws BookNotFoundException {
 		
-		Book book = bookService.findByISBN(isbn);
+		bookService.deleteByISBN(isbn);
+		String response = "Book deleted.";
+		return new ResponseEntity<>(response, HttpStatus.OK);
 		
-		if(book == null){
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			bookService.deleteByISBN(isbn);
-			String response = "Book deleted.";
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
 		
 	}
 

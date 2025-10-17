@@ -39,7 +39,7 @@ public class UserController {
 		
 		List<User> users = userService.findAllUsers();
 		
-		if(users == null || users.isEmpty())
+		if(users.isEmpty())
 			
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		else
@@ -67,12 +67,9 @@ public class UserController {
 	@PutMapping(value = "/users/{id}")
 	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id) throws UserNotFoundException {
 
-		if(user == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			User updatedUser = userService.updateUser(user, id);
-			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-		}
+		User updatedUser = userService.updateUser(user, id);
+		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+		
 	}
 	
 	// TODO - deleteUser (@Mappings, URI, and method)
@@ -80,12 +77,9 @@ public class UserController {
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) throws UserNotFoundException {
 		User user = userService.findUser(id);
 		
-		if(user == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			userService.deleteUser(id);
-			String response = "User with id = "+id+" has been deleted.";
-			return new ResponseEntity<>(response, HttpStatus.OK);
+		userService.deleteUser(id);
+		String response = "User with id = "+id+" has been deleted.";
+		return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
 
@@ -94,7 +88,7 @@ public class UserController {
 	public ResponseEntity<Object> getUserOrders(@PathVariable Long id) throws UserNotFoundException{
 		Set<Order> orders = userService.getUserOrders(id);
 		
-		if(orders == null || orders.isEmpty()) {
+		if(orders.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
 			return new ResponseEntity<>(orders, HttpStatus.OK);
@@ -105,26 +99,18 @@ public class UserController {
 	@GetMapping(value = "/users/{uid}/orders/{oid}")
 	public ResponseEntity<Order> getUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException {
 		Order order = userService.getUserOrder(uid, oid);
+		return new ResponseEntity<>(order, HttpStatus.OK);
 		
-		if(order == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			return new ResponseEntity<>(order, HttpStatus.OK);
-		}
 	}
 	
 	// TODO - deleteUserOrder (@Mappings, URI, and method)
 	@DeleteMapping(value = "/users/{uid}/orders/{oid}")
 	public ResponseEntity<String> deleteUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException{
 		Order order = userService.getUserOrder(uid, oid);
+		String response = "Order with id = "+oid+" belonging to user with id = "+uid+" has been deleted.";
+		userService.deleteOrderForUser(uid, oid);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 		
-		if(order == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			String response = "Order with id = "+oid+" belonging to user with id = "+uid+" has been deleted.";
-			userService.deleteOrderForUser(uid, oid);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
 	}
 	// TODO - createUserOrder (@Mappings, URI, and method) + HATEOAS links
 

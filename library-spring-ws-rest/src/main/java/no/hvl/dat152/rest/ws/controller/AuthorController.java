@@ -40,7 +40,7 @@ public class AuthorController {
 		public ResponseEntity<Object> getAllAuthors(){
 			List<Author> authors = authorService.findAll();
 			
-			if(authors == null || authors.isEmpty()) {
+			if(authors.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			} else {
 				return new ResponseEntity<>(authors, HttpStatus.OK);
@@ -51,43 +51,30 @@ public class AuthorController {
 		@GetMapping("/authors/{id}")
 		public ResponseEntity<Author> getAuthorById(@PathVariable int id) throws AuthorNotFoundException {
 			Author author = authorService.findById(id);
+			return new ResponseEntity<>(author, HttpStatus.OK);
 			
-			if(author == null) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			} else {
-				return new ResponseEntity<>(author, HttpStatus.OK);
-			}
 		}
 		
 		@PostMapping("/authors")
 		public ResponseEntity<Author> saveAuthor(@RequestBody Author author){
 			Author nAuthor = authorService.saveAuthor(author);
-			
 			return new ResponseEntity<>(nAuthor, HttpStatus.CREATED);
 		}
 		
 		@DeleteMapping("/authors/{id}")
 		public ResponseEntity<String> deleteById(@PathVariable int id) throws AuthorNotFoundException {
-			Author author = authorService.findById(id);
+			authorService.deleteById(id);
+			String response = "Author with id = "+id+" has been deleted.";
+			return new ResponseEntity<>(response, HttpStatus.OK);
 			
-			if(author == null) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			} else {
-				authorService.deleteById(id);
-				String response = "Author with id = "+id+" has been deleted.";
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
 		}
 		
 		@PutMapping("/authors/{id}")
 		public ResponseEntity<Author> updateAuthor(@RequestBody Author author, @PathVariable int id) throws AuthorNotFoundException {
 
-			if(author == null) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			} else {
-				Author uAuthor = authorService.updateAuthor(id, author);
-				return new ResponseEntity<>(uAuthor, HttpStatus.OK);
-			}
+			Author uAuthor = authorService.updateAuthor(id, author);
+			return new ResponseEntity<>(uAuthor, HttpStatus.OK);
+			
 		}
 	
 	// TODO - getBooksByAuthorId (@Mappings, URI, and method)
@@ -95,7 +82,7 @@ public class AuthorController {
 		public ResponseEntity<Object> getBooksByAuthorId(@PathVariable int id) throws AuthorNotFoundException, BookNotFoundException {
 			Set<Book> books = authorService.findBooksByAuthorId(id);
 			
-			if(books == null) {
+			if(books.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			} else {
 				return new ResponseEntity<>(books, HttpStatus.OK);
