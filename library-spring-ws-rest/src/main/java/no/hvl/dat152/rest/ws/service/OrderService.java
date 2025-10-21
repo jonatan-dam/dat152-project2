@@ -3,11 +3,10 @@
  */
 package no.hvl.dat152.rest.ws.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -67,5 +66,7 @@ public class OrderService {
 		orderRepository.save(existing);
 		return existing;
 	}
+	
+	
 
 }

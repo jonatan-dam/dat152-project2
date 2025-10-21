@@ -6,6 +6,7 @@ package no.hvl.dat152.rest.ws.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 import no.hvl.dat152.rest.ws.exceptions.OrderNotFoundException;
 import no.hvl.dat152.rest.ws.model.Order;
@@ -47,6 +51,10 @@ public class OrderController {
 	@GetMapping(value = "/orders/{id}")
 	public ResponseEntity<Order> getBorrowOrder(@PathVariable Long id) throws OrderNotFoundException {
 		Order order = orderService.findOrder(id);
+		Link rordersLink = linkTo(methodOn(OrderController.class).deleteBookOrder(id)).withRel("Return: DELETE");
+		Link uordersLink = linkTo(methodOn(OrderController.class).updateOrder(order, id)).withRel("Extend: PUT");
+		order.add(rordersLink);
+		order.add(uordersLink);
 		return new ResponseEntity<>(order, HttpStatus.OK);
 		
 	}

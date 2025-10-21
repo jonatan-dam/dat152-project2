@@ -105,14 +105,15 @@ public class UserService {
 	}
 	
 	// TODO public User createOrdersForUser(Long userid, Order order)
-	public User createOrdersForUSer(Long userid, Order order) throws UserNotFoundException {
+	public User createOrdersForUser(Long userid, Order order) throws UserNotFoundException {
 		User user = userRepository.findById(userid)
-				.orElseThrow(() -> new UserNotFoundException("User with id = "+userid+" not found!"));
+				.orElseThrow(()-> new UserNotFoundException("User with id: "+userid+" not found"));
 		
 		Set<Order> orders = user.getOrders();
 		orders.add(order);
 		userRepository.save(user);
 		
-		return user;
+		return userRepository.findById(userid)
+				.orElseThrow(() -> new UserNotFoundException("User with id: "+userid+" not found!"));
 	}
 }

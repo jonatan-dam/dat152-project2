@@ -3,6 +3,9 @@
  */
 package no.hvl.dat152.rest.ws.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 import java.util.Set;
 
@@ -75,12 +78,11 @@ public class UserController {
 	// TODO - deleteUser (@Mappings, URI, and method)
 	@DeleteMapping(value = "/users/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) throws UserNotFoundException {
-		User user = userService.findUser(id);
-		
+
 		userService.deleteUser(id);
 		String response = "User with id = "+id+" has been deleted.";
 		return new ResponseEntity<>(response, HttpStatus.OK);
-		}
+		
 	}
 
 	// TODO - getUserOrders (@Mappings, URI=/users/{id}/orders, and method)
@@ -106,13 +108,34 @@ public class UserController {
 	// TODO - deleteUserOrder (@Mappings, URI, and method)
 	@DeleteMapping(value = "/users/{uid}/orders/{oid}")
 	public ResponseEntity<String> deleteUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException{
-		Order order = userService.getUserOrder(uid, oid);
 		String response = "Order with id = "+oid+" belonging to user with id = "+uid+" has been deleted.";
 		userService.deleteOrderForUser(uid, oid);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 		
 	}
 	// TODO - createUserOrder (@Mappings, URI, and method) + HATEOAS links
+	@PostMapping("/users/{id}/orders")
+	public ResponseEntity<List<Order>> createOrdersForUser(@PathVariable Long id, @RequestBody Order order)
+	        throws UserNotFoundException {
+
+	    User updatedUser = userService.createOrdersForUser(id, order);
+	    Set<Order> orders = updatedUser.getOrders();
+
+	    // Add HATEOAS links for each order
+	    orders.forEach(o -> {
+	        try {
+				o.add(linkTo(methodOn(OrderController.class).getBorrowOrder(o.getId())).withSelfRel());
+				o.add(linkTo(methodOn(OrderController.class).deleteBookOrder(o.getId())).withRel("Return: DELETE"));
+			} catch (OrderNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
+	    });
+
+	    return new ResponseEntity<>(List.copyOf(orders), HttpStatus.CREATED);
+	}
+
 
 	
 }
