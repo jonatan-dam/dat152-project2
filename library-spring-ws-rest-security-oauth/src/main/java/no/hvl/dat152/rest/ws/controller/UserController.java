@@ -12,6 +12,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +40,7 @@ public class UserController {
 	private UserService userService;
 	
 	@GetMapping("/users")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Object> getUsers(){
 		
 		List<User> users = userService.findAllUsers();
@@ -50,6 +53,7 @@ public class UserController {
 	}
 	
 	@GetMapping(value = "/users/{id}")
+	@PreAuthorize("hasAuthority('ADMIN') or #id == authentication.details.userid")
 	public ResponseEntity<Object> getUser(@PathVariable Long id) throws UserNotFoundException, OrderNotFoundException{
 		
 		User user = userService.findUser(id);
@@ -60,6 +64,7 @@ public class UserController {
 	
 	// TODO - createUser (@Mappings, URI=/users, and method)
 	@PostMapping(value = "/users")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<User> createUser(@RequestBody User user){
 		User nUser = userService.saveUser(user);
 		
@@ -68,6 +73,7 @@ public class UserController {
 
 	// TODO - updateUser (@Mappings, URI, and method)
 	@PutMapping(value = "/users/{id}")
+	@PreAuthorize("hasAuthority('ADMIN') or #id == authentication.details.userid")
 	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id) throws UserNotFoundException {
 
 		User updatedUser = userService.updateUser(user, id);
@@ -77,6 +83,7 @@ public class UserController {
 	
 	// TODO - deleteUser (@Mappings, URI, and method)
 	@DeleteMapping(value = "/users/{id}")
+	@PreAuthorize("hasAuthority('ADMIN') or #id == authentication.details.userid")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) throws UserNotFoundException {
 
 		userService.deleteUser(id);
@@ -87,7 +94,10 @@ public class UserController {
 
 	// TODO - getUserOrders (@Mappings, URI=/users/{id}/orders, and method)
 	@GetMapping(value = "/users/{id}/orders")
+	@PreAuthorize("hasAuthority('ADMIN') or #id == authentication.details.userid")
 	public ResponseEntity<Object> getUserOrders(@PathVariable Long id) throws UserNotFoundException{
+		
+		
 		Set<Order> orders = userService.getUserOrders(id);
 		
 		if(orders.isEmpty()) {
@@ -99,6 +109,7 @@ public class UserController {
 	
 	// TODO - getUserOrder (@Mappings, URI=/users/{uid}/orders/{oid}, and method)
 	@GetMapping(value = "/users/{uid}/orders/{oid}")
+	@PreAuthorize("hasAuthority('ADMIN') or #uid == authentication.details.userid")
 	public ResponseEntity<Order> getUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException {
 		Order order = userService.getUserOrder(uid, oid);
 		return new ResponseEntity<>(order, HttpStatus.OK);
@@ -107,6 +118,7 @@ public class UserController {
 	
 	// TODO - deleteUserOrder (@Mappings, URI, and method)
 	@DeleteMapping(value = "/users/{uid}/orders/{oid}")
+	@PreAuthorize("hasAuthority('ADMIN') or #uid == authentication.details.userid")
 	public ResponseEntity<String> deleteUserOrder(@PathVariable Long uid, @PathVariable Long oid) throws UserNotFoundException, OrderNotFoundException{
 		String response = "Order with id = "+oid+" belonging to user with id = "+uid+" has been deleted.";
 		userService.deleteOrderForUser(uid, oid);
@@ -115,6 +127,7 @@ public class UserController {
 	}
 	// TODO - createUserOrder (@Mappings, URI, and method) + HATEOAS links
 	@PostMapping("/users/{id}/orders")
+	@PreAuthorize("hasAuthority('ADMIN') or #id == authentication.details.userid")
 	public ResponseEntity<List<Order>> createOrdersForUser(@PathVariable Long id, @RequestBody Order order)
 	        throws UserNotFoundException {
 
